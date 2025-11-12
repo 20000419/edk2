@@ -819,7 +819,6 @@ CFormPkg::DeclarePendingQuestion (
   EFI_VFR_VARSTORE_TYPE VarStoreType  = EFI_VFR_VARSTORE_INVALID;
   UINT8    LFlags;
   UINT32   MaxValue;
-  UINT32   ElementSize;
   CIfrGuid *GuidObj = NULL;
 
   //
@@ -883,9 +882,7 @@ CFormPkg::DeclarePendingQuestion (
             NewStr[0] = '\0';
             strcpy (NewStr, SName);
             strcat (NewStr, VarStr + strlen (FName));
-            ElementSize = 0;
-            ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo (NewStr, Info.mInfo.mVarOffset, Info.mVarType, Info.mVarTotalSize, ElementSize, Info.mIsBitVar);
-            Info.mVarElementSize = ElementSize;
+            ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo (NewStr, Info.mInfo.mVarOffset, Info.mVarType, Info.mVarTotalSize, Info.mIsBitVar);
             delete[] NewStr;
           }
         } else {

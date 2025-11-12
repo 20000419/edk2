@@ -823,7 +823,6 @@ vfrExtensionData[UINT8 *DataBuff, UINT32 Size, CHAR8 *TypeName, UINT32 TypeSize,
      UINT16   FieldOffset;
      UINT8    FieldType;
      UINT32   FieldSize;
-     UINT32   ElementSize = 0;
      UINT64   Data_U64 = 0;
      UINT32   Data_U32 = 0;
      UINT16   Data_U16 = 0;
@@ -893,7 +892,7 @@ vfrExtensionData[UINT8 *DataBuff, UINT32 Size, CHAR8 *TypeName, UINT32 TypeSize,
                 memcpy (ByteOffset, &Data_SID, TypeSize);                                                    
               }
             } else {
-              gCVfrVarDataTypeDB.GetDataFieldInfo(TFName, FieldOffset, FieldType, FieldSize, ElementSize, BitField);
+              gCVfrVarDataTypeDB.GetDataFieldInfo(TFName, FieldOffset, FieldType, FieldSize, BitField);
               if (BitField) {
                 Mask = (1 << FieldSize) - 1;
                 Offset = FieldOffset / 8;
@@ -1323,7 +1322,6 @@ vfrQuestionHeader[CIfrQuestionHeader & QHObj, EFI_QUESION_TYPE QType = QUESTION_
      EFI_VARSTORE_INFO Info;
      Info.mVarType               = EFI_IFR_TYPE_OTHER;
      Info.mVarTotalSize          = 0;
-     Info.mVarElementSize        = 0;
      Info.mInfo.mVarOffset       = EFI_VAROFFSET_INVALID;
      Info.mVarStoreId            = EFI_VARSTORE_ID_INVALID;
      Info.mIsBitVar              = FALSE;
@@ -1379,7 +1377,6 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
      EFI_VFR_RETURN_CODE   VfrReturnCode = VFR_RETURN_SUCCESS;
      EFI_IFR_TYPE_VALUE    Dummy        = gZeroEfiIfrTypeValue;
      EFI_GUID              *VarGuid     = NULL;
-     UINT32                ElementSize  = 0;
   >>
   (
     SN1:StringIdentifier                            << SName = SN1->getText(); _STRCAT(&VarIdStr, SN1->getText()); >>
@@ -1446,8 +1443,7 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
                                                          break;
                                                        case EFI_VFR_VARSTORE_BUFFER:
                                                        case EFI_VFR_VARSTORE_BUFFER_BITS:
-                                                       _PCATCH(gCVfrVarDataTypeDB.GetDataFieldInfo (VarStr, $Info.mInfo.mVarOffset, $Info.mVarType, $Info.mVarTotalSize, ElementSize, $Info.mIsBitVar), SN2->getLine(), VarStr);
-                                                       $Info.mVarElementSize = ElementSize;
+                                                         _PCATCH(gCVfrVarDataTypeDB.GetDataFieldInfo (VarStr, $Info.mInfo.mVarOffset, $Info.mVarType, $Info.mVarTotalSize, $Info.mIsBitVar), SN2->getLine(), VarStr);
                                                          VarGuid = gCVfrDataStorage.GetVarStoreGuid($Info.mVarStoreId);
                                                          _PCATCH((EFI_VFR_RETURN_CODE)gCVfrBufferConfig.Register (
                                                                     SName,
@@ -2297,7 +2293,6 @@ vfrStatementCheckBox :
      EFI_VARSTORE_INFO Info;
      Info.mVarType          = EFI_IFR_TYPE_OTHER;
      Info.mVarTotalSize     = 0;
-     Info.mVarElementSize   = 0;
      Info.mInfo.mVarOffset  = EFI_VAROFFSET_INVALID;
      Info.mVarStoreId       = EFI_VARSTORE_ID_INVALID;
      Info.mIsBitVar         = FALSE;
@@ -2829,7 +2824,6 @@ vfrStatementNumeric :
      EFI_VARSTORE_INFO Info;
      Info.mVarType          = EFI_IFR_TYPE_OTHER;
      Info.mVarTotalSize     = 0;
-     Info.mVarElementSize   = 0;
      Info.mInfo.mVarOffset  = EFI_VAROFFSET_INVALID;
      Info.mVarStoreId       = EFI_VARSTORE_ID_INVALID;
      Info.mIsBitVar         = FALSE;
@@ -3007,7 +3001,6 @@ vfrStatementOneOf :
      EFI_VARSTORE_INFO Info;
      Info.mVarType               = EFI_IFR_TYPE_OTHER;
      Info.mVarTotalSize          = 0;
-     Info.mVarElementSize        = 0;
      Info.mInfo.mVarOffset       = EFI_VAROFFSET_INVALID;
      Info.mVarStoreId            = EFI_VARSTORE_ID_INVALID;
      Info.mIsBitVar              = FALSE;
@@ -5003,38 +4996,30 @@ EfiVfrParser::_GET_CURRQEST_ARRAY_SIZE (
   VOID
   )
 {
-  UINT32 ElementSize;
+  UINT8 Size = 1;
 
-  ElementSize = mCurrQestVarInfo.mVarElementSize;
-  if (ElementSize == 0) {
-    switch (mCurrQestVarInfo.mVarType) {
-    case EFI_IFR_TYPE_NUM_SIZE_8:
-      ElementSize = 1;
-      break;
+  switch (mCurrQestVarInfo.mVarType) {
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    Size = 1;
+    break;
 
-    case EFI_IFR_TYPE_NUM_SIZE_16:
-      ElementSize = 2;
-      break;
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    Size = 2;
+    break;
 
-    case EFI_IFR_TYPE_NUM_SIZE_32:
-      ElementSize = 4;
-      break;
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    Size = 4;
+    break;
 
-    case EFI_IFR_TYPE_NUM_SIZE_64:
-      ElementSize = 8;
-      break;
+  case EFI_IFR_TYPE_NUM_SIZE_64:
+    Size = 8;
+    break;
 
-    default:
-      ElementSize = 1;
-      break;
-    }
+  default:
+    break;
   }
 
-  if (ElementSize == 0) {
-    return 0;
-  }
-
-  return (mCurrQestVarInfo.mVarTotalSize / ElementSize);
+  return (mCurrQestVarInfo.mVarTotalSize / Size);
 }
 
 UINT8

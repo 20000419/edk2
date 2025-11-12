@@ -211,7 +211,7 @@ public:
   EFI_VFR_RETURN_CODE GetDataType (IN CHAR8 *, OUT SVfrDataType **);
   EFI_VFR_RETURN_CODE GetDataTypeSize (IN CHAR8 *, OUT UINT32 *);
   EFI_VFR_RETURN_CODE GetDataTypeSize (IN UINT8, OUT UINT32 *);
-  EFI_VFR_RETURN_CODE GetDataFieldInfo (IN CHAR8 *, OUT UINT16 &, OUT UINT8 &, OUT UINT32 &, OUT UINT32 &, OUT BOOLEAN &);
+  EFI_VFR_RETURN_CODE GetDataFieldInfo (IN CHAR8 *, OUT UINT16 &, OUT UINT8 &, OUT UINT32 &, OUT BOOLEAN &);
 
   EFI_VFR_RETURN_CODE GetUserDefinedTypeNameList (OUT CHAR8 ***, OUT UINT32 *);
   EFI_VFR_RETURN_CODE ExtractFieldNameAndArrary (IN CHAR8 *&, OUT CHAR8 *, OUT UINT32 &);
@@ -288,7 +288,6 @@ struct EFI_VARSTORE_INFO {
   } mInfo;
   UINT8                     mVarType;
   UINT32                    mVarTotalSize;
-  UINT32                    mVarElementSize;
   BOOLEAN                   mIsBitVar;
 
   EFI_VARSTORE_INFO (VOID);
