@@ -1375,7 +1375,6 @@ CVfrVarDataTypeDB::GetDataFieldInfo (
   OUT UINT16   &Offset,
   OUT UINT8    &Type,
   OUT UINT32   &Size,
-  OUT UINT32   &ElementSize,
   OUT BOOLEAN  &BitField
   )
 {
@@ -1385,10 +1384,9 @@ CVfrVarDataTypeDB::GetDataFieldInfo (
   SVfrDataField       *pField = NULL;
   CHAR8               *VarStrName;
 
-  Offset       = 0;
-  Type         = EFI_IFR_TYPE_OTHER;
-  Size         = 0;
-  ElementSize  = 0;
+  Offset = 0;
+  Type   = EFI_IFR_TYPE_OTHER;
+  Size   = 0;
   VarStrName = VarStr;
 
   CHECK_ERROR_RETURN (ExtractStructTypeName (VarStr, TName), VFR_RETURN_SUCCESS);
@@ -1412,13 +1410,8 @@ CVfrVarDataTypeDB::GetDataFieldInfo (
     } else {
       Offset = (UINT16) (Offset + Tmp);
     }
-    Type        = GetFieldWidth (pField);
-    Size        = GetFieldSize (pField, ArrayIdx, BitField);
-    if (BitField) {
-      ElementSize = 1;
-    } else {
-      ElementSize = pField->mFieldType->mTotalSize;
-    }
+    Type   = GetFieldWidth (pField);
+    Size   = GetFieldSize (pField, ArrayIdx, BitField);
   }
   return VFR_RETURN_SUCCESS;
 }
@@ -2249,7 +2242,6 @@ CVfrDataStorage::GetBufferVarStoreFieldInfo (
       Info->mInfo.mVarOffset == pNode->mVarStoreInfo.mInfo.mVarOffset) {
       Info->mVarTotalSize = pNode->mVarStoreInfo.mVarTotalSize;
       Info->mVarType      = pNode->mVarStoreInfo.mVarType;
-      Info->mVarElementSize = pNode->mVarStoreInfo.mVarElementSize;
       return VFR_RETURN_SUCCESS;
     }
     pNode = pNode->mNext;
@@ -2577,7 +2569,6 @@ EFI_VARSTORE_INFO::EFI_VARSTORE_INFO (
   mInfo.mVarOffset = EFI_VAROFFSET_INVALID;
   mVarType         = EFI_IFR_TYPE_OTHER;
   mVarTotalSize    = 0;
-  mVarElementSize  = 0;
   mIsBitVar        = FALSE;
 }
 
@@ -2590,7 +2581,6 @@ EFI_VARSTORE_INFO::EFI_VARSTORE_INFO (
   mInfo.mVarOffset = Info.mInfo.mVarOffset;
   mVarType         = Info.mVarType;
   mVarTotalSize    = Info.mVarTotalSize;
-  mVarElementSize  = Info.mVarElementSize;
   mIsBitVar        = Info.mIsBitVar;
 }
 
@@ -2605,7 +2595,6 @@ EFI_VARSTORE_INFO::operator= (
     mInfo.mVarOffset = Info.mInfo.mVarOffset;
     mVarType         = Info.mVarType;
     mVarTotalSize    = Info.mVarTotalSize;
-    mVarElementSize  = Info.mVarElementSize;
     mIsBitVar        = Info.mIsBitVar;
   }
 
@@ -2622,7 +2611,6 @@ EFI_VARSTORE_INFO::operator == (
       (mInfo.mVarOffset == Info->mInfo.mVarOffset) &&
       (mVarType == Info->mVarType) &&
       (mVarTotalSize == Info->mVarTotalSize) &&
-      (mVarElementSize == Info->mVarElementSize) &&
       (mIsBitVar == Info->mIsBitVar)) {
     return TRUE;
   }
@@ -2638,7 +2626,6 @@ BufferVarStoreFieldInfoNode::BufferVarStoreFieldInfoNode(
   mVarStoreInfo.mVarTotalSize          = Info->mVarTotalSize;
   mVarStoreInfo.mInfo.mVarOffset       = Info->mInfo.mVarOffset;
   mVarStoreInfo.mVarStoreId            = Info->mVarStoreId;
-  mVarStoreInfo.mVarElementSize        = Info->mVarElementSize;
   mNext = NULL;
 }
 
@@ -2648,7 +2635,6 @@ BufferVarStoreFieldInfoNode::~BufferVarStoreFieldInfoNode ()
   mVarStoreInfo.mVarTotalSize          = 0;
   mVarStoreInfo.mInfo.mVarOffset       = EFI_VAROFFSET_INVALID;
   mVarStoreInfo.mVarStoreId            = EFI_VARSTORE_ID_INVALID;
-  mVarStoreInfo.mVarElementSize        = 0;
   mNext = NULL;
 }
 
