@@ -152,7 +152,7 @@
   DebugPrintErrorLevelLib          | MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   TpmMeasurementLib                | MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
 !if $(SECURE_BOOT_ENABLE) == TRUE
-  PlatformSecureLib                | OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+  PlatformSecureLib                | SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   AuthVariableLib                  | SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   SecureBootVariableLib            | SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
   SecureBootVariableProvisionLib   | SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
